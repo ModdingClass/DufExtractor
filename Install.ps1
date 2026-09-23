@@ -9,17 +9,25 @@
     Runs entirely under HKEY_CURRENT_USER, so no admin rights are required.
 
 .PARAMETER ExePath
-    Path to the published DufExtractor.exe. Defaults to .\publish\DufExtractor.exe
-    next to this script.
+    Path to DufExtractor.exe. If not given, looks next to this script first
+    (release zip layout), then in .\publish\DufExtractor.exe (dev layout).
 #>
 param(
-    [string]$ExePath = (Join-Path $PSScriptRoot "publish\DufExtractor.exe")
+    [string]$ExePath
 )
 
 $ErrorActionPreference = "Stop"
 
-if (-not (Test-Path $ExePath)) {
-    throw "DufExtractor.exe not found at: $ExePath`nBuild/publish it first, or pass -ExePath."
+if (-not $ExePath) {
+    $candidates = @(
+        (Join-Path $PSScriptRoot "DufExtractor.exe"),
+        (Join-Path $PSScriptRoot "publish\DufExtractor.exe")
+    )
+    $ExePath = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+}
+
+if (-not $ExePath -or -not (Test-Path $ExePath)) {
+    throw "DufExtractor.exe not found next to this script or in .\publish. Build/publish it first, or pass -ExePath."
 }
 $ExePath = (Resolve-Path $ExePath).Path
 
