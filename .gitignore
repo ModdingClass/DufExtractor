@@ -2,3 +2,6 @@ bin/
 obj/
 publish/
 *.user
+
+# Local-only test samples (real DAZ Studio files may be proprietary; never commit these)
+TestSample/
